@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Recommendation System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #007bff;
+    }
+    input {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .recommendations {
+      margin-top: 20px;
+    }
+    .recommendations ul {
+      list-style: none;
+      padding: 0;
+    }
+    .recommendations li {
+      background: #f1f1f1;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Movie Recommendation System</h1>
+    <p>Enter a movie title to get recommendations:</p>
+    <input type="text" id="movie-title" placeholder="Enter movie title here...">
+    <button onclick="getRecommendations()">Get Recommendations</button>
+    <div class="recommendations">
+      <h3>Recommendations:</h3>
+      <ul id="recommendation-list"></ul>
+    </div>
+  </div>
+
+  <script>
+    async function getRecommendations() {
+      const title = document.getElementById('movie-title').value;
+      const recommendationList = document.getElementById('recommendation-list');
+      recommendationList.innerHTML = '';
+
+      if (!title) {
+        alert('Please enter a movie title!');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/recommend?title=${encodeURIComponent(title)}`);
+        const data = await response.json();
+
+        if (data.error) {
+          recommendationList.innerHTML = `<li>${data.error}</li>`;
+        } else {
+          data.recommendations.forEach(movie => {
+            const li = document.createElement('li');
+            li.textContent = movie;
+            recommendationList.appendChild(li);
+          });
+        }
+      } catch (error) {
+        recommendationList.innerHTML = '<li>Failed to fetch recommendations. Please try again.</li>';
+      }
+    }
+  </script>
+</body>
+</html>
