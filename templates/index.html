@@ -61,45 +61,43 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Movie Recommendation System</h1>
-    <p>Enter a movie title to get recommendations:</p>
-    <input type="text" id="movie-title" placeholder="Enter movie title here...">
-    <button onclick="getRecommendations()">Get Recommendations</button>
-    <div class="recommendations">
-      <h3>Recommendations:</h3>
-      <ul id="recommendation-list"></ul>
-    </div>
-  </div>
+  <h1>Movie Recommendation System</h1>
+
+  <!-- Content-Based Recommendation -->
+  <h2>Search by Title</h2>
+  <input type="text" id="titleInput" placeholder="Enter movie title">
+  <button onclick="recommendByTitle()">Search</button>
+  <ul id="titleResults"></ul>
+
+  <!-- Collaborative Filtering -->
+  <h2>Recommendations Based on a Movie</h2>
+  <input type="number" id="movieIdInput" placeholder="Enter movie ID">
+  <button onclick="recommendSimilar()">Find Similar Movies</button>
+  <ul id="movieIdResults"></ul>
 
   <script>
-    async function getRecommendations() {
-      const title = document.getElementById('movie-title').value;
-      const recommendationList = document.getElementById('recommendation-list');
-      recommendationList.innerHTML = '';
-
-      if (!title) {
-        alert('Please enter a movie title!');
-        return;
-      }
-
-      try {
-        const response = await fetch(`/recommend?title=${encodeURIComponent(title)}`);
-        const data = await response.json();
-
-        if (data.error) {
-          recommendationList.innerHTML = `<li>${data.error}</li>`;
+    async function recommendByTitle() {
+        const title = document.getElementById('titleInput').value;
+        const response = await fetch(`/recommend_by_title?title=${encodeURIComponent(title)}`);
+        const results = await response.json();
+        if (results.error) {
+            alert(results.error);
         } else {
-          data.recommendations.forEach(movie => {
-            const li = document.createElement('li');
-            li.textContent = movie;
-            recommendationList.appendChild(li);
-          });
+            document.getElementById('titleResults').innerHTML = results.map(r => `<li>${r.title} - ${r.genres}</li>`).join('');
         }
-      } catch (error) {
-        recommendationList.innerHTML = '<li>Failed to fetch recommendations. Please try again.</li>';
-      }
+    }
+
+    async function recommendSimilar() {
+        const movieId = document.getElementById('movieIdInput').value;
+        const response = await fetch(`/recommend_similar?movie_id=${movieId}`);
+        const results = await response.json();
+        if (results.error) {
+            alert(results.error);
+        } else {
+            document.getElementById('movieIdResults').innerHTML = results.map(r => `<li>${r.title} - ${r.genres}</li>`).join('');
+        }
     }
   </script>
+
 </body>
 </html>
