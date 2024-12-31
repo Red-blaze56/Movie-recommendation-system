@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Movie Recommendation System</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Add FontAwesome for icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+        <style>
+            /* General Styles */
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #000;
+                color: #fff;
+                font-family: 'Arial', sans-serif;
+            }
+    
+            /* Header Styles */
+            header {
+                background-color: #141414;
+                padding: 15px 30px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            }
+    
+            header h1 {
+                color: #e50914;
+                font-size: 2.5em;
+                margin: 0;
+                font-weight: bold;
+            }
+    
+            header nav a {
+                margin-left: 20px;
+                color: #fff;
+                text-decoration: none;
+                font-size: 1.2em;
+                padding: 8px 16px;
+                transition: background-color 0.3s, border-radius 0.3s;
+                border-radius: 8px;
+            }
+    
+            header nav a:hover {
+                background-color: #e50914;
+                color: white;
+                border-radius: 12px;
+            }
+    
+            /* Hero Section with Slider */
+            .hero {
+                position: relative;
+                height: 80vh;
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+    
+            .hero-slider {
+                display: flex;
+                width: 100%;
+                height: 100%;
+                transition: transform 1s ease-in-out;
+            }
+    
+            .hero-slide {
+                flex: 0 0 100%;
+                height: 100%;
+                background-size: cover;
+                background-position: center;
+            }
+    
+            .hero-controls {
+                position: absolute;
+                top: 50%;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                transform: translateY(-50%);
+            }
+    
+            .hero-control {
+                background: rgba(0, 0, 0, 0.5);
+                border: none;
+                color: #fff;
+                font-size: 2em;
+                cursor: pointer;
+                padding: 10px;
+            }
+    
+            .hero-overlay {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                transition: opacity 1s ease-in-out;
+                opacity: 0;
+            }
+    
+            .hero-overlay:hover {
+                opacity: 1;
+            }
+    
+            .hero-overlay h1 {
+                font-size: 3em;
+                font-weight: bold;
+                margin: 0;
+                color: #fff;
+            }
+    
+            .hero-overlay p {
+                font-size: 1.5em;
+                margin: 10px 0;
+            }
+    
+            .hero-overlay button {
+                background-color: #e50914;
+                color: white;
+                border: none;
+                font-size: 1.2em;
+                padding: 10px 20px;
+                cursor: pointer;
+                border-radius: 5px;
+                transition: background-color 0.3s;
+            }
+    
+            .hero-overlay button:hover {
+                background-color: #f7060e;
+            }
+    
+            /* Movie Section */
+            .movies {
+                padding: 20px;
+            }
+    
+            .movies h2 {
+                font-size: 2em;
+                color: #e50914;
+                margin-bottom: 10px;
+            }
+    
+            .movie-grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 15px;
+            }
+    
+            .movie-card {
+                background-color: #222;
+                border-radius: 5px;
+                overflow: hidden;
+                transition: transform 0.3s, border 0.3s ease-in-out;
+            }
+    
+            .movie-card:hover {
+                transform: scale(1.05);
+                border: 3px solid #e50914;
+            }
+    
+            .movie-card img {
+                width: 100%;
+                display: block;
+            }
+    
+            .movie-card .content {
+                padding: 10px;
+            }
+    
+            .movie-card .content h3 {
+                margin: 5px 0;
+                font-size: 1em;
+                color: #fff;
+                transition: text-shadow 0.3s ease-in-out;
+            }
+    
+            .movie-card .content h3:hover {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            }
+    
+            .movie-card .content a {
+                color: #e50914;
+                text-decoration: none;
+                font-size: 0.9em;
+            }
+    
+            .movie-card .content .icons {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+    
+            .movie-card .content .icons i {
+                font-size: 1.2em;
+                color: #e50914;
+            }
+    
+            /* Footer */
+            footer {
+                text-align: center;
+                padding: 20px;
+                background-color: #141414;
+                color: #fff;
+                margin-top: 20px;
+            }
+        </style>
+    </head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>Movie Recommender</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/Content">Search by Title</a>
+            <a href="/collaborative">Similar Movies</a>
+            <a href="/about">About</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-slider">
+            <div class="hero-slide" style="background-image:  url('static/images/dune.jpeg');"></div>
+            <div class="hero-slide" style="background-image: url('static/images/1326785.jpeg');"></div>
+            <div class="hero-slide" style="background-image: url('static/images/harry.jpeg');"></div>
+            <div class="hero-slide" style="background-image: url('static/images/annabelle.jpeg');"></div>
+            <div class="hero-slide" style="background-image: url('static/images/mission.jpg');"></div>
+            <div class="hero-slide" style="background-image: url('static/images/joker.jpg');"></div>
+            <div class="hero-slide" style="background-image: url('static/images/godzilla.jpeg');"></div>
+        </div>
+        <div class="hero-overlay animate__animated animate__fadeIn">
+            <h1>Discover Your Next Favorite Movie</h1>
+            <p>Personalized movie recommendations tailored just for you!</p>
+            <button class="hero-control" onclick="nextSlide()">Get Started</button>
+        </div>
+        <div class="hero-controls">
+            <button class="hero-control" onclick="prevSlide()">&#8249;</button>
+            <button class="hero-control" onclick="nextSlide()">&#8250;</button>
+        </div>
+    </div>
+
+    <!-- Movies Section -->
+    <div class="movies">
+        <h2>Trending Movies</h2>
+        <div class="movie-grid">
+            <div class="movie-card">
+                <img src="{{ url_for('static', filename='images/avatar.jpeg') }}" alt="Avatar">
+                <div class="content">
+                    <h3>Avatar</h3>
+                    <div class="icons">
+                        <a href="https://www.youtube.com/watch?v=6ziBFh3V1aM" target="_blank" rel="noopener noreferrer"><i
+                                class="fab fa-youtube"></i> Trailer</a>
+                        <a href="https://www.imdb.com/title/tt0499549/" target="_blank" rel="noopener noreferrer"><i class="fab fa-imdb"></i>
+                            IMDb</a>
+                    </div>
+                    <p>IMDb Rating: 8.0</p>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src={{ url_for('static', filename='images/inception.jpg') }} alt="Inception">
+                <div class="content">
+                    <h3>Inception</h3>
+                    <div class="icons">
+                        <a href="https://www.youtube.com/watch?v=YoHD9XEInc0" target="_blank" rel="noopener noreferrer"><i
+                                class="fab fa-youtube"></i> Trailer</a>
+                        <a href="https://www.imdb.com/title/tt1375666/" target="_blank" rel="noopener noreferrer"><i class="fab fa-imdb"></i>
+                            IMDb</a>
+                    </div>
+                    <p>IMDb Rating: 8.8</p>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src={{ url_for('static', filename='images/godzz.jpeg') }} alt="Godzilla">
+                <div class="content">
+                    <h3>Godzilla</h3>
+                    <div class="icons">
+                        <a href="https://www.youtube.com/watch?v=vIu85WQTPRc" target="_blank" rel="noopener noreferrer"><i
+                                class="fab fa-youtube"></i> Trailer</a>
+                        <a href="https://www.imdb.com/title/tt0831387/" target="_blank" rel="noopener noreferrer"><i class="fab fa-imdb"></i>
+                            IMDb</a>
+                    </div>
+                    <p>IMDb Rating: 6.4</p>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src={{ url_for('static', filename='images/zumanji.jpeg') }} alt="Jumanji">
+                <div class="content">
+                    <h3>Jumanji</h3>
+                    <div class="icons">
+                        <a href="https://www.youtube.com/watch?v=2QKg5SZ_35I" target="_blank" rel="noopener noreferrer"><i
+                                class="fab fa-youtube"></i> Trailer</a>
+                        <a href="https://www.imdb.com/title/tt2283362/" target="_blank" rel="noopener noreferrer"><i class="fab fa-imdb"></i>
+                            IMDb</a>
+                    </div>
+                    <p>IMDb Rating: 6.9</p>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src={{ url_for('static', filename='images/titanic.jpeg') }} alt="Titanic">
+                <div class="content">
+                    <h3>Titanic</h3>
+                    <div class="icons">
+                        <a href="https://www.youtube.com/watch?v=2e-eXJ6HgkQ" target="_blank" rel="noopener noreferrer"><i
+                                class="fab fa-youtube"></i> Trailer</a>
+                        <a href="https://www.imdb.com/title/tt0120338/" target="_blank" rel="noopener noreferrer"><i class="fab fa-imdb"></i>
+                            IMDb</a>
+                    </div>
+                    <p>IMDb Rating: 7.9</p>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src={{ url_for('static', filename='images/dark_knight.jpeg') }} alt="The Dark Knight">
+                <div class="content">
+                    <h3>The Dark Knight</h3>
+                    <div class="icons">
+                        <a href="https://www.youtube.com/watch?v=EXeTwQWrcwY" target="_blank" rel="noopener noreferrer"><i
+                                class="fab fa-youtube"></i> Trailer</a>
+                        <a href="https://www.imdb.com/title/tt0468569/" target="_blank" rel="noopener noreferrer"><i class="fab fa-imdb"></i>
+                            IMDb</a>
+                    </div>
+                    <p>IMDb Rating: 9.0</p>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src={{ url_for('static', filename='images/interstellar.jpeg') }} alt="Interstellar">
+                <div class="content">
+                    <h3>Interstellar</h3>
+                    <div class="icons">
+                        <a href="https://www.youtube.com/watch?v=zSWdZVtXT7E" target="_blank" rel="noopener noreferrer"><i
+                                class="fab fa-youtube"></i> Trailer</a>
+                        <a href="https://www.imdb.com/title/tt0816692/" target="_blank" rel="noopener noreferrer"><i class="fab fa-imdb"></i>
+                            IMDb</a>
+                    </div>
+                    <p>IMDb Rating: 8.6</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        Movie Recommendation System | Miniproject | AIML
+    </footer>
+
+    <script>
+        let currentIndex = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+
+        function showSlide(index) {
+            const totalSlides = slides.length;
+            if (index >= totalSlides) index = 0;
+            if (index < 0) index = totalSlides - 1;
+
+            document.querySelector('.hero-slider').style.transform = `translateX(-${index * 100}%)`;
+            currentIndex = index;
+        }
+
+        function nextSlide() {
+            showSlide(currentIndex + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentIndex - 1);
+        }
+
+        setInterval(nextSlide, 5000); // Automatically switch every 5 seconds
+    </script>
+
+</body>
+</html>
